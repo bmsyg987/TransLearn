@@ -46,9 +46,8 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Orientation="Horizontal" Grid.Row="0">
-                        <Button x:Name="BtnOcrStart" Content="▶ 화면 번역 시작" Click="BtnOcrStart_Click" Background="#007ACC"/>
-                        <TextBlock Text="※ 현재 테스트를 위해 모니터 좌측 상단(500x300) 영역을 자동으로 캡처합니다." 
-                                   VerticalAlignment="Center" Margin="10,0,0,0" Foreground="#AAA"/>
+                        <Button x:Name="BtnOcrStart" Content="▶ 화면 번역 시작 (선택 영역)" Click="BtnOcrStart_Click" Background="#007ACC"/>
+                        <TextBlock Text="※ 초록색 창을 단어/문장 위에 올려두세요." VerticalAlignment="Center" Margin="10,0,0,0" Foreground="#AAA"/>
                     </StackPanel>
 
                     <GroupBox Header="📝 원본 텍스트 (Source)" Grid.Row="1">
@@ -89,40 +88,61 @@
 
                     <Button Grid.Row="0" x:Name="BtnRefreshLearning" Content="🔄 학습 데이터 새로고침" Click="BtnRefreshLearning_Click" HorizontalAlignment="Left"/>
 
-                    <DataGrid Grid.Row="1" x:Name="GridLearning" AutoGenerateColumns="True" Background="#2D2D30" 
-                              RowBackground="#2D2D30" AlternatingRowBackground="#3E3E42" Foreground="White" 
-                              BorderThickness="0" Margin="0,10,0,0">
+                    <DataGrid Grid.Row="1" x:Name="GridLearning" AutoGenerateColumns="False" 
+          Background="#2D2D30" RowBackground="#2D2D30" AlternatingRowBackground="#3E3E42" 
+          Foreground="White" BorderThickness="0" Margin="0,10,0,0"
+          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#555" HeadersVisibility="Column">
+
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="Background" Value="#1E1E1E"/>
                                 <Setter Property="Foreground" Value="White"/>
-                                <Setter Property="Padding" Value="5"/>
+                                <Setter Property="Padding" Value="10,5"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
                             </Style>
                         </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="단어 (Word)" Binding="{Binding WordOrPhrase}" Width="150" FontWeight="Bold"/>
+
+                            <DataGridTextColumn Header="빈도" Binding="{Binding Frequency}" Width="50"/>
+
+                            <DataGridTemplateColumn Header="💡 뜻 (Definition)" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ContextSentence}" TextWrapping="Wrap" Padding="5" LineHeight="20"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="삭제" Width="60">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="🗑" Click="BtnDeleteRow_Click" 
+                            Background="#DC3545" Foreground="White" BorderThickness="0"
+                            Padding="5,2" Margin="2" Cursor="Hand"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
 
             <TabItem Header="⚙️ 환경 설정">
                 <StackPanel Margin="20">
-                    <GroupBox Header="API 키 설정">
+                    <GroupBox Header="API 키 설정 (API 사용 시)">
                         <StackPanel Margin="10">
                             <TextBlock Text="DeepL API Key:" Margin="0,5"/>
                             <PasswordBox x:Name="BoxDeepLKey" Height="30"/>
-
                             <TextBlock Text="Azure Speech Key:" Margin="0,10,0,5"/>
                             <PasswordBox x:Name="BoxAzureKey" Height="30"/>
-
                             <Button Content="설정 저장 (Save)" HorizontalAlignment="Right" Margin="0,10,0,0" Width="100"/>
                         </StackPanel>
                     </GroupBox>
-
-                    <GroupBox Header="번역 모델 선택 [cite: 543]">
-                        <StackPanel Margin="10" Orientation="Horizontal">
-                            <RadioButton Content="DeepL API (Default)" IsChecked="True" Margin="0,0,20,0" Foreground="White"/>
-                            <RadioButton Content="Google Gemini" Foreground="White"/>
-                        </StackPanel>
-                    </GroupBox>
+                    <TextBlock Text="※ 현재 버전은 오프라인 사전(WordNet)을 사용하여 API 키 없이도 단어 뜻을 학습합니다." 
+                               Margin="10" Foreground="#888"/>
                 </StackPanel>
             </TabItem>
         </TabControl>

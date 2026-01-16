@@ -148,17 +148,76 @@ namespace TransLearn
         // ==========================================
         // 탭 3: 학습 모드 (DB 조회)
         // ==========================================
+        private void BtnDeleteRow_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // 클릭된 버튼이 속한 행(Row)의 데이터를 가져옵니다.
+                Button btn = sender as Button;
+                System.Data.DataRowView row = btn.DataContext as System.Data.DataRowView;
+
+                if (row != null)
+                {
+                    string wordToDelete = row["WordOrPhrase"].ToString();
+
+                    if (MessageBox.Show($"'{wordToDelete}' 단어를 삭제하시겠습니까?", "삭제 확인", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                    {
+                        // DB에서 삭제
+                        string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TransLearn", "translearn.sqlite");
+                        string connString = $"Data Source={dbPath};Version=3;";
+
+                        using (var conn = new System.Data.SQLite.SQLiteConnection(connString))
+                        {
+                            conn.Open();
+                            string sql = "DELETE FROM LearnTable WHERE WordOrPhrase = @word";
+                            using (var cmd = new System.Data.SQLite.SQLiteCommand(sql, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@word", wordToDelete);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        // 삭제 후 목록 새로고침
+                        BtnRefreshLearning_Click(null, null);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"삭제 실패: {ex.Message}");
+            }
+        }
+
+        // [2] 목록 불러오기 함수 (기존 함수 내용을 이걸로 교체 확인)
         private void BtnRefreshLearning_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TransLearn", "translearn.sqlite");
+
+                if (!File.Exists(dbPath))
+                {
+                    MessageBox.Show("아직 저장된 학습 데이터가 없습니다. 화면 번역을 먼저 진행해주세요!");
+                    return;
+                }
+
                 string connString = $"Data Source={dbPath};Version=3;";
 
                 using (var conn = new System.Data.SQLite.SQLiteConnection(connString))
                 {
                     conn.Open();
-                    string sql = "SELECT WordOrPhrase as 단어, Frequency as 빈도, ContextSentence as 예문 FROM LearnTable ORDER BY Frequency DESC";
+
+                    // [정렬 수정] ORDER BY Id DESC 
+                    // Id는 데이터가 들어온 순서대로 1, 2, 3... 번호가 붙습니다.
+                    // DESC(내림차순)로 정렬하면 큰 숫자(최신 데이터)가 맨 위로 옵니다!
+                    string sql = @"
+                SELECT 
+                    WordOrPhrase, 
+                    Frequency, 
+                    ContextSentence 
+                FROM LearnTable 
+                ORDER BY Id DESC";
+
                     var adapter = new System.Data.SQLite.SQLiteDataAdapter(sql, conn);
                     var dt = new System.Data.DataTable();
                     adapter.Fill(dt);
