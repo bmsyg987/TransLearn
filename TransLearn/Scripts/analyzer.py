@@ -2,7 +2,8 @@
 import sys
 import json
 import spacy
-
+import warnings             
+warnings.filterwarnings("ignore")
 # This script performs linguistic analysis on text piped from stdin.
 # It identifies key words/phrases and good example sentences.
 # The result is printed to stdout as a JSON string.
