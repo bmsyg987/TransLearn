@@ -1,0 +1,23 @@
+﻿<Window x:Class="TransLearn.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="캡처 영역" Height="300" Width="500"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="CanResize" Topmost="True" ShowInTaskbar="False">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome ResizeBorderThickness="8" CaptionHeight="0" CornerRadius="0" GlassFrameThickness="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Border BorderBrush="#00FF00" BorderThickness="4" Background="#1100FF00" 
+            MouseLeftButtonDown="Border_MouseLeftButtonDown">
+        <Grid>
+            <TextBlock Text="이 영역을 번역합니다" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center" 
+                       Foreground="#00FF00" FontWeight="Bold" IsHitTestVisible="False" Opacity="0.8"/>
+            <TextBlock Text="(테두리를 잡아당겨 크기 조절 / 가운데를 잡고 이동)" 
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"
+                       FontSize="10" Foreground="#00FF00" IsHitTestVisible="False" Opacity="0.6"/>
+        </Grid>
+    </Border>
+</Window>
